@@ -1,0 +1,54 @@
+{
+  "applicationId": "neutralinojs.react.ts.vite.template",
+  "version": "1.0.0",
+  "defaultMode": "window",
+  "documentRoot": "/react-src/build/",
+  "url": "/",
+  "enableServer": true,
+  "enableNativeAPI": true,
+  "tokenSecurity": "one-time",
+  "nativeAllowList": [
+    "app.*",
+    "computer.*",
+    "window.*"
+  ],
+  "logging": {
+    "enabled": true,
+    "writeToLogFile": true
+  },
+  "modes": {
+    "window": {
+      "title": "File Explorer",
+      "width": 800,
+      "height": 600,
+      "minWidth": 800,
+      "minHeight": 400,
+      "fullScreen": false,
+      "alwaysOnTop": false,
+      "icon": "/react-src/public/assets/images/icon.png",
+      "enableInspector": false,
+      "borderless": false,
+      "maximize": false,
+      "hidden": false,
+      "resizable": true,
+      "exitProcessOnClose": true,
+      "useSavedState": false,
+      "center": true
+    }
+  },
+  "cli": {
+    "binaryName": "windows-explorer",
+    "resourcesPath": "/react-src/build/",
+    "extensionsPath": "/extensions/",
+    "binaryVersion": "5.0.0",
+    "clientVersion": "5.0.1",
+    "frontendLibrary": {
+      "patchFile": "/react-src/index.html",
+      "devUrl": "http://localhost:3000",
+      "projectPath": "/react-src/",
+      "initCommand": "npm install",
+      "devCommand": "npm run dev",
+      "buildCommand": "npm run build"
+    }
+  }
+}
