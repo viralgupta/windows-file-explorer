@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { app } from "@neutralinojs/lib";
+import { useTabState } from '../state/tab';
+
 
 export const FolderIcon = () => {
   return (
@@ -71,26 +71,7 @@ export const PCIcon = () => {
 };
 
 const Tabs = () => {
-  const [focusedTab, setFocusedTab] = useState(0);
-  const [data, setData] = useState<
-    Array<{ type?: "root" | "folder"; name: string; location: string }>
-  >([
-    {
-      type: "root",
-      name: "This PC",
-      location: "/",
-    },
-    {
-      type: "folder",
-      name: "C:",
-      location: "C:/",
-    },
-    {
-      type: "folder",
-      name: "D:",
-      location: "D:/",
-    },
-  ]);
+  const { tabState, tabAction } = useTabState();
 
   const Tab = ({
     type,
@@ -125,57 +106,37 @@ const Tabs = () => {
         {type === "folder" && <FolderIcon />}
         {name}
         <svg
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             closeTab(pos);
           }}
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1024 1024"
-          className={`ml-auto aspect-square h-full p-0.5 fill-white opacity-30 group-hover:opacity-100 hover:bg-[#343434] rounded-sm ${
-            focused ? "opacity-100" : "opacity-50"
+          className={`ml-auto z-20 aspect-square h-full p-0.5 fill-white opacity-30 group-hover:opacity-100 hover:bg-[#454545] rounded-sm ${
+            focused ? "opacity-50" : "opacity-1000"
           }`}
         >
           <path d="M810.65984 170.65984q18.3296 0 30.49472 12.16512t12.16512 30.49472q0 18.00192-12.32896 30.33088l-268.67712 268.32896 268.67712 268.32896q12.32896 12.32896 12.32896 30.33088 0 18.3296-12.16512 30.49472t-30.49472 12.16512q-18.00192 0-30.33088-12.32896l-268.32896-268.67712-268.32896 268.67712q-12.32896 12.32896-30.33088 12.32896-18.3296 0-30.49472-12.16512t-12.16512-30.49472q0-18.00192 12.32896-30.33088l268.67712-268.32896-268.67712-268.32896q-12.32896-12.32896-12.32896-30.33088 0-18.3296 12.16512-30.49472t30.49472-12.16512q18.00192 0 30.33088 12.32896l268.32896 268.67712 268.32896-268.67712q12.32896-12.32896 30.33088-12.32896z" />
         </svg>
       </div>
     );
-  };
-
-  const closeTab = (index: number) => {
-    const newData = [...data];
-    newData.splice(index, 1);
-    setData(newData);
-    if (data.length == 0) {
-      app.exit();
-    }
-    setFocusedTab(index > 0 ? index - 1 : 0);
-  };
-
-  const addTab = () => {
-    const newData = [...data];
-    newData.push({
-      type: "root",
-      name: "This PC",
-      location: "/",
-    });
-    setData(newData);
-    setFocusedTab(data.length);
-  };
+  };  
 
   return (
     <div className="h-full w-3/4 px-3 pt-2 flex">
-      {data.map((tab, index) => (
+      {tabState.Tabs.map((tab, index) => (
         <Tab
-          closeTab={closeTab}
-          setFocus={setFocusedTab}
+          closeTab={tabAction.closeTab}
+          setFocus={tabAction.setFocusedTab}
           key={index}
           pos={index}
-          focused={index == focusedTab ? true : false}
-          name={tab.name}
+          focused={index == tabState.focusedTab ? true : false}
+          name={tab.folder}
           type={tab.type == "root" ? "root" : "folder"}
         />
       ))}
       <div
-        onClick={addTab}
+        onClick={tabAction.addTab}
         className="flex items-center aspect-square"
       >
         <svg
