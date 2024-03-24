@@ -1,7 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
-import { app } from "@neutralinojs/lib";
-import { useEffect } from "react";
-
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { app, computer, filesystem } from "@neutralinojs/lib";
 
 interface TabState {
   focusedTab: number;
@@ -16,42 +14,32 @@ interface TabActions {
   closeTab: (index: number) => void;
   addTab: () => void;
   setFocusedTab: (index: number) => void;
+  getRootFolder: () => Promise<"D:/" | "/">;
+  navigateToPath: (path: string, foldername: string) => void;
 }
 
-const TabStateContext = createContext<{
-  tabState: TabState;
-  tabAction: TabActions;
-} | undefined>(undefined);
+const TabStateContext = createContext<
+  | {
+      tabState: TabState;
+      tabAction: TabActions;
+    }
+  | undefined
+>(undefined);
 
 interface TabStateProviderProps {
   children: React.ReactNode;
 }
 
-
-export const TabStateProvider: React.FC<TabStateProviderProps> = ({ children }) => {
+export const TabStateProvider: React.FC<TabStateProviderProps> = ({
+  children,
+}) => {
+  const [rootFolder, setRootFolder] = useState<"D:/" | "/" | null>(null);
   const [tabState, setTabState] = useState<TabState>({
     focusedTab: 0,
-    Tabs: [
-      {
-        type: "root",
-        folder: "This PC",
-        location: "/",
-      },
-      {
-        type: "folder",
-        folder: "C:",
-        location: "C:/",
-      },
-      {
-        type: "folder",
-        folder: "D:",
-        location: "D:/",
-      },
-    ]
+    Tabs: [],
   });
 
   const closeTab = (index: number) => {
-    console.log("close tab", index)
     const newData = [...tabState.Tabs];
     newData.splice(index, 1);
 
@@ -59,7 +47,6 @@ export const TabStateProvider: React.FC<TabStateProviderProps> = ({ children }) 
       focusedTab: tabState.focusedTab > 0 ? tabState.focusedTab - 1 : 0,
       Tabs: newData,
     });
-    
 
     if (newData.length === 0) {
       app.exit();
@@ -67,11 +54,12 @@ export const TabStateProvider: React.FC<TabStateProviderProps> = ({ children }) 
   };
 
   const addTab = () => {
+    if (rootFolder == null) return;
     const newData = [...tabState.Tabs];
     newData.push({
-      type: 'root',
-      folder: 'This PC',
-      location: '/',
+      type: rootFolder == "/" ? "root" : "folder",
+      folder: rootFolder,
+      location: rootFolder,
     });
 
     setTabState({
@@ -81,25 +69,64 @@ export const TabStateProvider: React.FC<TabStateProviderProps> = ({ children }) 
   };
 
   const setFocusedTab = (index: number) => {
-    console.log("focused tab", index)
     setTabState({
       focusedTab: index,
       Tabs: tabState.Tabs,
     });
-  }
+  };
+
+  const getRootFolder: () => Promise<"D:/" | "/"> = async () => {
+    let rootFolder: "D:/" | "/" = "/";
+    const data = await computer.getOSInfo();
+    if (data.description.includes("Windows") || data.name.includes("Windows")) {
+      rootFolder = "D:/";
+    } else if (data.description.includes("Mac") || data.name.includes("Mac")) {
+      rootFolder = "/";
+    } else if (
+      data.description.includes("Linux") ||
+      data.name.includes("Linux")
+    ) {
+      rootFolder = "/";
+    }
+    return rootFolder;
+  };
+
+  const navigateToPath = (path: string, foldername: string) => {
+    if(path.endsWith(":")){
+      path = path + "/";
+    }
+    const newdata = [...tabState.Tabs];
+    newdata[tabState.focusedTab] = {
+      location: path,
+      folder: foldername,
+      type: "folder",
+    };
+    setTabState({
+      focusedTab: tabState.focusedTab,
+      Tabs: newdata,
+    });
+  };
+
+  useEffect(() => {
+    getRootFolder().then((data) => {
+      setRootFolder(data);
+    });
+  }, []);
+
+  useEffect(() => {
+    addTab();
+  }, [rootFolder]);
 
   const stateAndActions = {
     tabState,
     tabAction: {
       closeTab,
       addTab,
-      setFocusedTab
-    }
+      setFocusedTab,
+      getRootFolder,
+      navigateToPath
+    },
   };
-
-  useEffect(() => {
-    console.log(tabState)
-  }, [tabState])
 
   return (
     <TabStateContext.Provider value={stateAndActions}>
@@ -111,7 +138,14 @@ export const TabStateProvider: React.FC<TabStateProviderProps> = ({ children }) 
 export const useTabState = () => {
   const context = useContext(TabStateContext);
   if (!context) {
-    throw new Error('useTabState must be used within a TabStateProvider');
+    throw new Error("useTabState must be used within a TabStateProvider");
   }
   return context;
+};
+
+export const listDirectory: (
+  path: string
+) => Promise<filesystem.DirectoryEntry[]> = async (path: string) => {
+  const data = await filesystem.readDirectory(path);
+  return data;
 };

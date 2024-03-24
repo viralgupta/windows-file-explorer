@@ -10,7 +10,8 @@
   "nativeAllowList": [
     "app.*",
     "computer.*",
-    "window.*"
+    "window.*",
+    "filesystem.*"
   ],
   "logging": {
     "enabled": true,

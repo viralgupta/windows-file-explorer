@@ -1,7 +1,7 @@
 import { useTabState } from '../state/tab';
 
 
-export const FolderIcon = () => {
+const FolderIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
