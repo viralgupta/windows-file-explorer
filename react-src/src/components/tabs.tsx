@@ -104,7 +104,7 @@ const Tabs = () => {
       >
         {type === "root" && <PCIcon />}
         {type === "folder" && <FolderIcon />}
-        {name}
+        {name.replace(" ", "\u00A0").replace("-", "\u00A0")}
         <svg
           onClick={(e) => {
             e.stopPropagation();

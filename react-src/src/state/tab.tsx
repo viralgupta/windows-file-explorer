@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { app, computer, filesystem } from "@neutralinojs/lib";
+import { app, computer, events, filesystem, os } from "@neutralinojs/lib";
+import { toast } from "sonner";
 
 interface TabState {
   focusedTab: number;
@@ -16,6 +17,16 @@ interface TabActions {
   setFocusedTab: (index: number) => void;
   getRootFolder: () => Promise<"D:/" | "/">;
   navigateToPath: (path: string, foldername: string) => void;
+  openFile: (path: string) => void;
+  SearchFolder: (
+    name: string,
+    path: string
+  ) => Promise<
+    {
+      path: string;
+      name: string;
+    }[]
+  >;
 }
 
 const TabStateContext = createContext<
@@ -92,7 +103,8 @@ export const TabStateProvider: React.FC<TabStateProviderProps> = ({
   };
 
   const navigateToPath = (path: string, foldername: string) => {
-    if(path.endsWith(":")){
+    console.log(path, foldername);
+    if (path.endsWith(":")) {
       path = path + "/";
     }
     const newdata = [...tabState.Tabs];
@@ -104,6 +116,74 @@ export const TabStateProvider: React.FC<TabStateProviderProps> = ({
     setTabState({
       focusedTab: tabState.focusedTab,
       Tabs: newdata,
+    });
+    filesystem
+      .getWatchers()
+      .then((watchers) => {
+        watchers.forEach((watcher) => {
+          filesystem.removeWatcher(watcher.id);
+        });
+      })
+      .then(() => {
+        filesystem.createWatcher(path);
+      });
+  };
+
+  const openFile = async (path: string) => {
+    try {
+      if (path.endsWith(".pdf")) {
+      } else {
+        toast.error("Pdf files are only supported for now.");
+        os.showNotification(
+          "Not Supported!",
+          "Pdf files are only supported for now."
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const SearchFolder: (
+    name: string,
+    path: string
+  ) => Promise<
+    {
+      path: string;
+      name: string;
+    }[]
+  > = (name: string, path: string) => {
+    return new Promise((resolve, reject) => {
+      let command: string = "";
+      getRootFolder()
+        .then((data) => {
+          if (data == "/") {
+            command = `find ${path.replace(" ", "\ ")} -type f -iname "${name}*"`;
+          } else {
+            command = `powershell.exe -Command "Get-ChildItem -Path '${path}' -Recurse | Where-Object { $_.Name -like '${name}*' }"`;
+          }
+
+          os.execCommand(command)
+            .then((result) => {
+              let finalresult: { path: string; name: string }[] = [];
+              if (data == "D:/") {
+                finalresult = parseDirectoryListingForWindows(
+                  result.stdOut.toString()
+                );
+              } else {
+                finalresult = parseDirectoryListingForUnix(
+                  result.stdOut.toString()
+                );
+              }
+              resolve(finalresult);
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   };
 
@@ -117,6 +197,28 @@ export const TabStateProvider: React.FC<TabStateProviderProps> = ({
     addTab();
   }, [rootFolder]);
 
+  let debouncePromise: Promise<void> | null = null;
+
+  events.on("watchFile", () => {
+    if (debouncePromise !== null) {
+      return;
+    }
+
+    debouncePromise = new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+        debouncePromise = null;
+      }, 1000);
+    });
+
+    debouncePromise.then(() => {
+      setTabState({
+        focusedTab: tabState.focusedTab,
+        Tabs: tabState.Tabs,
+      });
+    });
+  });
+
   const stateAndActions = {
     tabState,
     tabAction: {
@@ -124,7 +226,9 @@ export const TabStateProvider: React.FC<TabStateProviderProps> = ({
       addTab,
       setFocusedTab,
       getRootFolder,
-      navigateToPath
+      navigateToPath,
+      openFile,
+      SearchFolder,
     },
   };
 
@@ -149,3 +253,41 @@ export const listDirectory: (
   const data = await filesystem.readDirectory(path);
   return data;
 };
+
+function parseDirectoryListingForWindows(directoryListing: string) {
+  const lines = directoryListing
+    .split("\n")
+    .filter((line) => line.trim() !== "");
+
+  const files: { path: string; name: string }[] = [];
+  let currentDirectory = "";
+
+  lines.forEach((line) => {
+    const parts = line.trim().split(/\s{2,}/);
+
+    if (parts.length === 1 && parts[0].startsWith("Directory:")) {
+      currentDirectory = parts[0].replace("Directory:", "").trim();
+    } else if (parts.length >= 4 && parts[3] !== "") {
+      const filePath = `${currentDirectory}`;
+      files.push({
+        name: parts[3].includes(" ")
+          ? parts[3].slice(parts[3].indexOf(" ")).trim()
+          : parts[3].trim(),
+        path: filePath.replace(/\\/g, "/") + "/"
+      });
+    }
+  });
+
+  return files;
+}
+
+function parseDirectoryListingForUnix(directoryListing: string) {
+  const files: { path: string; name: string }[] = [];
+  directoryListing.split("\n").forEach((line) => {
+    files.push({
+      name: line.slice(line.lastIndexOf("/") + 1),
+      path: line.slice(0, line.lastIndexOf("/") + 1),
+    });
+  });
+  return files;
+}

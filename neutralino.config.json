@@ -11,7 +11,9 @@
     "app.*",
     "computer.*",
     "window.*",
-    "filesystem.*"
+    "filesystem.*",
+    "storage.*",
+    "os.*"
   ],
   "logging": {
     "enabled": true,

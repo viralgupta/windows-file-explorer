@@ -1,3 +1,4 @@
+import { Toaster } from "sonner";
 import SideBar from "./components/SideBar";
 import Body from "./components/body";
 import Footer from "./components/footer";
@@ -8,6 +9,7 @@ import { TabStateProvider } from "./state/tab";
 export function App() {
   return (
     <div className="w-screen h-screen">
+      <Toaster duration={2000} theme="dark" />
       <TabStateProvider>
         <Header />
         <Search_Bar />
@@ -16,7 +18,7 @@ export function App() {
             <SideBar />
           </div>
           <div className="p-6 text-white ">
-            <Body/>
+            <Body />
           </div>
         </div>
         <Footer />

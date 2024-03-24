@@ -1,5 +1,4 @@
 import { useTabState } from "../state/tab";
-import { app } from "@neutralinojs/lib";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,6 +6,8 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "../../@/shadcn-components/ui/breadcrumb";
+
+import { useEffect, useState } from "react";
 
 export const Arrow = () => {
   return (
@@ -22,7 +23,7 @@ export const Arrow = () => {
       />
     </svg>
   );
-}
+};
 
 export const Rotate_Arrow = () => {
   return (
@@ -62,7 +63,10 @@ export const Chevron = () => {
       viewBox="0 0 20 20"
       className="w-4 h-4 stroke-white"
     >
-      <path fill="white" d="M12.95 10.707l.707-.707L8 4.343 6.586 5.757 10.828 10l-4.242 4.243L8 15.657l4.95-4.95z" />
+      <path
+        fill="white"
+        d="M12.95 10.707l.707-.707L8 4.343 6.586 5.757 10.828 10l-4.242 4.243L8 15.657l4.95-4.95z"
+      />
     </svg>
   );
 };
@@ -83,6 +87,25 @@ export const PC_Icon = () => {
 
 const Search_Bar = () => {
   const { tabState, tabAction } = useTabState();
+  const [searchinput, setSearchinput] = useState<null | string>(null);
+  const [searchinputfoucsed, setSearchinputfoucsed] = useState(false);
+  const [searchResults, setSearchResults] = useState<
+    { path: string; name: string }[] | null
+  >(null);
+
+  const getResults = async () => {
+    if (searchinput === null) return;
+    const results = await tabAction.SearchFolder(
+      searchinput,
+      tabState.Tabs[tabState.focusedTab].location
+    );
+    setSearchResults(results);
+  };
+
+  useEffect(() => {
+    if (searchinput === null || searchinput === "") return;
+    getResults();
+  }, [searchinput]);
 
   return (
     <div className="h-10 flex bg-[#2c2c2c] p-1 px-3 text-white fill-white stroke-white border-b border-[#454545]">
@@ -109,13 +132,28 @@ const Search_Bar = () => {
                 .map((loc, index) => {
                   if (loc === "") return;
                   return (
-                    <div
-                      key={index}
-                      className="w-max h-full flex items-center"
-                    >
-                      <BreadcrumbItem onClick={()=>{tabAction.navigateToPath(tabState.Tabs[tabState.focusedTab].location.slice(0,tabState.Tabs[tabState.focusedTab].location.indexOf(loc) + loc.length), loc)}} key={index + 100} className="">
+                    <div key={index} className="w-max h-full flex items-center">
+                      <BreadcrumbItem
+                        onClick={() => {
+                          tabAction.navigateToPath(
+                            tabState.Tabs[tabState.focusedTab].location.slice(
+                              0,
+                              tabState.Tabs[
+                                tabState.focusedTab
+                              ].location.indexOf(loc) + loc.length
+                            ),
+                            loc
+                          );
+                        }}
+                        key={index + 100}
+                        className=""
+                      >
                         <BreadcrumbLink className="hover:bg-[#515151] p-1 px-2 rounded-sm hover:cursor-pointer ">
-                          {loc == "" && index === 0 ? <PC_Icon /> : loc.replace(" ", '\u00A0')}
+                          {loc == "" && index === 0 ? (
+                            <PC_Icon />
+                          ) : (
+                            loc.replace(" ", "\u00A0")
+                          )}
                         </BreadcrumbLink>
                       </BreadcrumbItem>
                       {index !==
@@ -128,8 +166,17 @@ const Search_Bar = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className="bg-[#454545] w-1/4 focus-within:w-1/2 duration-500 transition-[width] focus-within:bg-[#202020] rounded-sm flex items-center px-1">
+      <div className="relative bg-[#454545] w-1/4 focus-within:w-1/2 duration-500 transition-[width] focus-within:bg-[#202020] rounded-sm flex items-center px-1">
         <input
+          onChange={(e) => {
+            setSearchinput(e.target.value);
+          }}
+          onFocus={() => setSearchinputfoucsed(true)}
+          onBlur={() => {
+            setTimeout(() => {
+              setSearchinputfoucsed(false);
+            }, 100);
+          }}
           placeholder={`Search ${
             tabState.Tabs.length > 0 &&
             tabState.Tabs[tabState.focusedTab].folder
@@ -138,6 +185,23 @@ const Search_Bar = () => {
           className="bg-[#454545] focus:bg-[#202020] focus:ring-0 focus:border-0 focus:outline-0 h-full w-full text-sm"
         />
         <SearchIcon />
+        {!!searchinput && searchinput.length > 0 && searchinputfoucsed && (
+          <div className="absolute top-0 translate-y-9 left-0 w-full h-auto bg-[#454545] bg-opacity-95 rounded-sm p-1 text-sm text-[#e0e0e0] max-h-44 overflow-x-scroll hide-scroll">
+            {searchResults &&
+              searchResults.length > 0 &&
+              searchResults.map((result, index) => {
+                return (
+                  <div
+                    onClick={() => {tabAction.navigateToPath(result.path, result.name);}}
+                    key={index}
+                    className="p-1 z-20 hover:bg-[#202020] hover:cursor-pointer rounded-sm flex items-center"
+                  >
+                    {result.name.replace(" ", "\u00A0")}
+                  </div>
+                );
+              })}
+          </div>
+        )}
       </div>
     </div>
   );

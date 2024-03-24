@@ -75,7 +75,7 @@ const Body = () => {
       {!!contents &&
         contents.map((item, index) => {
           return (
-            <ContextMenu>
+            <ContextMenu key={index}>
               <ContextMenuTrigger>
                 <div
                   style={{ fontSize: "10px", lineHeight: "1rem" }}
@@ -85,13 +85,16 @@ const Body = () => {
                     if (item.type === "DIRECTORY") {
                       tabAction.navigateToPath(item.path, item.entry);
                     }
+                    else{
+                      tabAction.openFile(item.path);
+                    }
                   }}
                   className="p-2 h-[88px] w-[72px] bg-white bg-opacity-0 hover:bg-opacity-20 hover:cursor-pointer focus:bg-opacity-40 focus:outline-none flex flex-col items-center justify-center"
                 >
                   {item.type === "DIRECTORY" ? <FolderIcon /> : <FileIcon />}
                   <div className="overflow-hidden w-full text-center">
                     {item.entry.length > 11
-                      ? item.entry.slice(0, 10)
+                      ? item.entry.replace(" ", "\u00A0").replace("-", "\u00A0").slice(0, 10)
                       : item.entry}
                     {item.entry.length > 11 && "..."}
                   </div>

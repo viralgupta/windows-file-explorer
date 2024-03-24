@@ -78,7 +78,6 @@ const Folder = ({
   useEffect(() => {
     if (open) {
       listDirectory(path).then((data) => {
-        console.log(data);
         setlist(data);
       });
     }
@@ -97,9 +96,9 @@ const Folder = ({
       <div>
         {open &&
           list &&
-          list.map((item) => {
+          list.map((item, index) => {
             return (
-              <div className="pl-2">
+              <div className="pl-2" key={index}>
                 <Folder path={item.path} name={item.entry} type={item.type} />
               </div>
             );
