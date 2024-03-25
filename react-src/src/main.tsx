@@ -1,6 +1,6 @@
 import './index.css';
 
-import { init, window as neuWindow } from '@neutralinojs/lib';
+import { app, events, init, window as neuWindow } from '@neutralinojs/lib';
 
 import { App } from './App';
 import React from 'react';
@@ -49,5 +49,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   </React.Fragment>
 );
 
+function onWindowClose() {
+  app.exit();
+}
+
+events.on('windowClose', onWindowClose);
 
 neuWindow.focus();
