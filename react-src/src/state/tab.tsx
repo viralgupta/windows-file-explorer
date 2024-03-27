@@ -158,7 +158,10 @@ export const TabStateProvider: React.FC<TabStateProviderProps> = ({
       getRootFolder()
         .then((data) => {
           if (data == "/") {
-            command = `find ${path.replace(" ", "\ ")} -type f -iname "${name}*"`;
+            command = `find ${path.replace(
+              " ",
+              "\ "
+            )} -type f -iname "${name}*"`;
           } else {
             command = `powershell.exe -Command "Get-ChildItem -Path '${path}' -Recurse | Where-Object { $_.Name -like '${name}*' }"`;
           }
@@ -180,6 +183,28 @@ export const TabStateProvider: React.FC<TabStateProviderProps> = ({
             .catch((error) => {
               reject(error);
             });
+          // let processid: number;
+          // os.spawnProcess(command).then((process) => {
+          //   processid = process.id;
+          // });
+
+          // events.on("spawnedProcess", (evt) => {
+          //   if (processid == evt.detail.id) {
+          //     switch (evt.detail.action) {
+          //       case "stdOut":
+          //         console.log(evt.detail.data);
+          //         break;
+          //       case "stdErr":
+          //         console.error(evt.detail.data);
+          //         break;
+          //       case "exit":
+          //         console.log(
+          //           `Ping process terminated with exit code: ${evt.detail.data}`
+          //         );
+          //         break;
+          //     }
+          //   }
+          // });
         })
         .catch((error) => {
           reject(error);
@@ -273,7 +298,7 @@ function parseDirectoryListingForWindows(directoryListing: string) {
         name: parts[3].includes(" ")
           ? parts[3].slice(parts[3].indexOf(" ")).trim()
           : parts[3].trim(),
-        path: filePath.replace(/\\/g, "/") + "/"
+        path: filePath.replace(/\\/g, "/") + "/",
       });
     }
   });
