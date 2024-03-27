@@ -22,7 +22,7 @@
   "modes": {
     "window": {
       "title": "File Explorer",
-      "width": 800,
+      "width": 1000,
       "height": 600,
       "minWidth": 800,
       "minHeight": 400,
@@ -30,7 +30,7 @@
       "alwaysOnTop": false,
       "icon": "/react-src/public/assets/images/icon.png",
       "enableInspector": false,
-      "borderless": false,
+      "borderless": true,
       "maximize": false,
       "hidden": false,
       "resizable": true,

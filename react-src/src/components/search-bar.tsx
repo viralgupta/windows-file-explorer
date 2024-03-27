@@ -192,7 +192,7 @@ const Search_Bar = () => {
               searchResults.map((result, index) => {
                 return (
                   <div
-                    onClick={() => {tabAction.navigateToPath(result.path, result.name);}}
+                    onClick={(e) => {e.stopPropagation();tabAction.navigateToPath(result.path, result.name);}}
                     key={index}
                     className="p-1 z-20 hover:bg-[#202020] hover:cursor-pointer rounded-sm flex items-center"
                   >
