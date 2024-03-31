@@ -175,7 +175,7 @@ const Search_Bar = () => {
           onBlur={() => {
             setTimeout(() => {
               setSearchinputfoucsed(false);
-            }, 100);
+            }, 200);
           }}
           placeholder={`Search ${
             tabState.Tabs.length > 0 &&

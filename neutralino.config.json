@@ -29,7 +29,7 @@
       "fullScreen": false,
       "alwaysOnTop": false,
       "icon": "/react-src/public/assets/images/icon.png",
-      "enableInspector": false,
+      "enableInspector": true,
       "borderless": true,
       "maximize": false,
       "hidden": false,
