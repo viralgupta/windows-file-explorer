@@ -29,7 +29,7 @@
       "fullScreen": false,
       "alwaysOnTop": false,
       "icon": "/react-src/public/assets/images/icon.png",
-      "enableInspector": true,
+      "enableInspector": false,
       "borderless": true,
       "maximize": false,
       "hidden": false,
@@ -52,6 +52,21 @@
       "initCommand": "npm install",
       "devCommand": "npm run dev",
       "buildCommand": "npm run build"
+    }
+  },
+  "buildScript": {
+    "mac": {
+      "architecture": ["arm64"],
+      "minimumOS": "10.13.0",
+      "appName": "Windows-File-Explorer",
+      "appBundleName": "Windows-File-Explorer",
+      "appIdentifier": "com.marketmix.ext.bun.demo",
+      "appIcon":  "./react-src/public/assets/images/icon.icns"
+    },
+    "win": {
+      "architecture": ["x64"],
+      "appName": "Windows-File-Explorer",
+      "appIcon": "./react-src/public/favicon.ico"
     }
   }
 }

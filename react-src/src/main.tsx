@@ -17,7 +17,7 @@ if (import.meta.env.DEV) {
       // @ts-ignore
       authInfo = require('../../.tmp/auth_info.json');
     } catch (error) {
-      authInfo = await import('../../.tmp/auth_info.json');
+      // authInfo = await import('../../.tmp/auth_info.json');
     }
     finally{
       const { nlToken, nlPort } = authInfo;
