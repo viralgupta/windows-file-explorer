@@ -1,36 +1,15 @@
-# Neutralinojs + React + TS + Vite template
+Windows File Explorer made for linux And Macs for windows lovers ❤️
 
-With HMR mode and `styled-components`
+Steps to setup locally
 
-**If the native API calls don't work, look at the main.tsx file and try to uncomment some lines**. Maybe it would be useful in your case
+```bash
+npm i -g @neutralinojs/neu
 
-## Instructions
-
-### Install
-
-1. `git clone https://github.com/JustPilz/neu-react-ts-vite-template.git`
-2. `npm i -g @neutralinojs/neu` (skip if `neu` is already installed)
-3. `cd react-src && npm install`
-4. `cd ../ && npm run dev`
-
-### Run
-
-```
-npm run dev
+git clone https://github.com/viralgupta/windows-file-explorer.git
+cd windows-file-explorer/react-src
+npm install
+cd ..
+neu run
 ```
 
-it's an alias to `neu run -- --window-enable-inspector`
-
-### Build
-
-```
-npm run build
-```
-
-it's an alias to `neu build`
-
-### Build + zip
-
-```
-neu build --release
-```
+![WhatsApp Image 2024-04-01 at 10 22 59 PM](https://github.com/viralgupta/windows-file-explorer/assets/119971154/af8a04f6-ca36-4567-a5b8-8c9a395acbe2)
