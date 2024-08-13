@@ -16,7 +16,7 @@
     "os.*"
   ],
   "logging": {
-    "enabled": true,
+    "enabled": false,
     "writeToLogFile": true
   },
   "modes": {
@@ -52,6 +52,13 @@
       "initCommand": "npm install",
       "devCommand": "npm run dev",
       "buildCommand": "npm run build"
+    },
+    "projectRunner": {
+      "projectPath": "/",
+      "buildPath": "./node-src/dist/",
+      "initCommand": "npm run runner:install",  
+      "devCommand": "npm run runner:dev",     
+      "buildCommand": "npm run runner:build"
     }
   },
   "buildScript": {

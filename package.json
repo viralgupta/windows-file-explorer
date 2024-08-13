@@ -8,10 +8,17 @@
     "url": "https://github.com/JustPilz"
   },
   "scripts": {
-    "dev": "neu run -- --window-enable-inspector",
-    "build": "neu build"
+    "dev": "neu run",
+    "build": "neu build --clean",
+    "runner:dev": "tsx ./server.ts",
+    "runner:install": "npm install",
+    "runner:build": "tsc"
   },
   "devDependencies": {
-    "@types/node": "^20.11.20"
+    "@types/node": "^20.11.20",
+    "tsx": "^4.17.0"
+  },
+  "dependencies": {
+    "node-neutralino": "^0.0.5"
   }
 }

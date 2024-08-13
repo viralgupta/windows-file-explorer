@@ -15,3 +15,5 @@ neutralino.js
 .storage
 
 *.log
+
+node-src/dist
