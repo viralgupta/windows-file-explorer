@@ -7,6 +7,12 @@
   "enableServer": true,
   "enableNativeAPI": true,
   "tokenSecurity": "one-time",
+  "enableExtensions": true,
+  "extensions": [
+    {
+        "id": "js.node-neutralino.projectRunner"
+    }
+  ],
   "nativeAllowList": [
     "app.*",
     "computer.*",

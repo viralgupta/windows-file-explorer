@@ -19,6 +19,6 @@
     "tsx": "^4.17.0"
   },
   "dependencies": {
-    "node-neutralino": "^0.0.6"
+    "node-neutralino": "^0.0.7"
   }
 }
