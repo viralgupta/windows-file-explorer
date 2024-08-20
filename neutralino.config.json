@@ -59,7 +59,7 @@
       "devCommand": "npm run dev",
       "buildCommand": "npm run build"
     },
-    "projectRunner": {
+    "hostProject": {
       "projectPath": "/",
       "buildPath": "./node-src/dist/",
       "initCommand": "npm run runner:install",  
